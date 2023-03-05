@@ -15,6 +15,7 @@ public class Calculator extends JFrame implements ActionListener {
     private static final String MULTIPLICATION_OPERATOR = "*";
     private static final String SUBTRACTION_OPERATOR = "-";
     private static final String SUM_OPERATOR = "+";
+    private static final String ZERO = "0";
     private static final int MAX_INPUT_LENGTH = 20;
     private static final int INPUT_MODE = 0;
     private static final int RESULT_MODE = 1;
@@ -113,6 +114,21 @@ public class Calculator extends JFrame implements ActionListener {
                     processOperator(jButtonButtons[i].getText());
                 }
 
+                switch (i) {
+                    case 10: // +/-
+                        processSignChange();
+                        break;
+                    case 11: // decimal point
+                        addDecimalPoint();
+                        break;
+                    case 12: // =
+                        processEquals();
+                        break;
+                    default:
+                        break;
+
+                }
+
             }
         }
 
@@ -124,7 +140,7 @@ public class Calculator extends JFrame implements ActionListener {
         setBackground(Color.WHITE);
 
         jPanelMaster = new JPanel();
-        jLabelOutPut = new JLabel("0");
+        jLabelOutPut = new JLabel(ZERO);
         jLabelOutPut.setHorizontalTextPosition(SwingConstants.RIGHT);
         jLabelOutPut.setBackground(Color.GRAY);
         jLabelOutPut.setOpaque(true);
@@ -247,8 +263,8 @@ public class Calculator extends JFrame implements ActionListener {
     }
 
     private void clearAll() {
-        setDisplayString("0"); //set display string
-        lastOperator = "0";
+        setDisplayString(ZERO); //set display string
+        lastOperator = ZERO;
         lastNumber = 0;
         displayMode = INPUT_MODE;
         clearOnNextDigit = true;
@@ -259,11 +275,11 @@ public class Calculator extends JFrame implements ActionListener {
 
         String inputString = jLabelOutPut.getText();
 
-        if (inputString.indexOf("0") == 0) {
+        if (inputString.indexOf(ZERO) == 0) {
             inputString = inputString.substring(1);
         }
 
-        if ((!inputString.equals("0") || digit > 0) && inputString.length() < MAX_INPUT_LENGTH) {
+        if ((!ZERO.equals(inputString) || digit > 0) && inputString.length() < MAX_INPUT_LENGTH) {
             setDisplayString(inputString + digit);
         }
 
@@ -274,11 +290,11 @@ public class Calculator extends JFrame implements ActionListener {
     private void processOperator(String operator) {
         if (displayMode != ERROR_MODE) {
             double numberInDisplay = getNumberInDisplay();
-            if (!"0".equals(lastOperator)) {
+            if (!ZERO.equals(lastOperator)) {
                 try {
                     double result = processLastOperator();
                     displayResult(result);
-                } catch (DivideByZeroException e) {
+                } catch (UnsupportedOperationException e) {
                     displayError(e.getMessage());
                 }
             } else {
@@ -290,13 +306,13 @@ public class Calculator extends JFrame implements ActionListener {
         }
     }
 
-    private double processLastOperator() throws DivideByZeroException {
+    private double processLastOperator() throws UnsupportedOperationException {
         double numberInDisplay = getNumberInDisplay();
 
         switch (lastOperator) {
             case DIVISION_OPERATOR:
                 if (numberInDisplay == 0)
-                    throw new DivideByZeroException("Division by zero is not allowed in mathematics!");
+                    throw new UnsupportedOperationException("Division by zero is not allowed in mathematics!");
                 return lastNumber / numberInDisplay;
             case MULTIPLICATION_OPERATOR:
                 return lastNumber / numberInDisplay;
@@ -320,14 +336,62 @@ public class Calculator extends JFrame implements ActionListener {
         clearOnNextDigit = true;
     }
 
-    private void displayError(String error) {
-        setDisplayString(error);
+    private void displayError(String errorMessage) {
+        setDisplayString(errorMessage);
         lastNumber = 0;
         displayMode = RESULT_MODE;
         clearOnNextDigit = true;
     }
 
+    private void processSignChange() {
+        if (displayMode == INPUT_MODE) {
+            String input = getDisplayStrig();
+
+            if (input.length() > 0 && !ZERO.equals(input)) {
+                if (input.indexOf("-") == 0) {
+                    setDisplayString(input.substring(1));
+                } else {
+                    setDisplayString("-" + input);
+                }
+            } else if (displayMode == RESULT_MODE) {
+                double numberInDisplay = getNumberInDisplay();
+                if (numberInDisplay != 0) displayResult(-numberInDisplay);
+            }
+        }
+    }
+
+    private void addDecimalPoint() {
+        displayMode = INPUT_MODE;
+
+        if (clearOnNextDigit) setDisplayString("");
+        String inputString = getDisplayStrig();
+
+        // if the input string already has a decimal point, don't do anything
+        if (!inputString.contains(".")) setDisplayString(inputString + ".");
+    }
+
+    private void processEquals() {
+        double result;
+
+        if (displayMode != ERROR_MODE) {
+            try {
+                result = processLastOperator();
+                displayResult(result);
+            } catch (UnsupportedOperationException e) {
+                displayError(e.getMessage());
+            }
+
+            lastOperator = ZERO;
+        }
+    }
+
     private void setDisplayString(String string) {
         jLabelOutPut.setText(string);
     }
+
+    private String getDisplayStrig() {
+        return jLabelOutPut.getText();
+    }
+
+
 }
