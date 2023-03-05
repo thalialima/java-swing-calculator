@@ -8,13 +8,15 @@ import java.util.List;
 
 public class Calculator extends JFrame implements ActionListener {
 
-    // variables
-    final int MAX_INPUT_LENGTH = 20;
-    final int INPUT_MODE = 0;
-    final int RESULT_MODE = 1;
-    final int ERROR_MODE = 2;
-    int displayMode;
+    //constants
+    private static final String ABOUT_INFO = " About Java Swing Calculator";
+    private static final int MAX_INPUT_LENGTH = 20;
+    private static final int INPUT_MODE = 0;
+    private static final int RESULT_MODE = 1;
+    private static final int ERROR_MODE = 2;
 
+    // variables
+    int displayMode;
     boolean clearOnNextDigit;
     boolean percent;
     double lastNumber;
@@ -26,7 +28,7 @@ public class Calculator extends JFrame implements ActionListener {
     private JMenuItem jMenuItemAbout;
 
     private JLabel jLabelOutPut;
-    private JButton jButtonButtons[];
+    private JButton[] jButtonButtons;
     private JPanel jPanelMaster;
     private JPanel jPanelBackSpace;
     private JPanel jPanelControl;
@@ -84,6 +86,11 @@ public class Calculator extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        double result = 0;
+
+        if (e.getSource() == jMenuItemAbout) {
+            JDialog jDialogAbout = new CustomAboutDialog(this, ABOUT_INFO, true);
+        }
 
 
     }
@@ -101,7 +108,7 @@ public class Calculator extends JFrame implements ActionListener {
 
     private void addComponentsToFrame() {
 
-        final List<String> OPERATORS = Arrays.asList("+/-", ".", "=", "/", "*", "-", "+", "sqrt", "1/x", "%");
+        final List<String> operators = Arrays.asList("+/-", ".", "=", "/", "*", "-", "+", "sqrt", "1/x", "%");
 
         getContentPane().add(jLabelOutPut, BorderLayout.NORTH);
 
@@ -116,7 +123,7 @@ public class Calculator extends JFrame implements ActionListener {
         // create operator JButtons
         for (int i = 0; i < 10; i++) {
             // set each JButton to an operator
-            jButtonButtons[i + 10] = new JButton(OPERATORS.get(i));
+            jButtonButtons[i + 10] = new JButton(operators.get(i));
         }
 
         jPanelBackSpace = new JPanel();
