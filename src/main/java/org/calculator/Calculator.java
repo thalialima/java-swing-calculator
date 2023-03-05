@@ -10,10 +10,22 @@ public class Calculator extends JFrame implements ActionListener {
 
     //constants
     private static final String ABOUT_INFO = " About Java Swing Calculator";
+    private static final List<String> OPERATORS = Arrays.asList("+/-", ".", "=", "/", "*", "-", "+", "sqrt", "1/x", "%");
+    private static final String DIVISION_OPERATOR = "/";
+    private static final String MULTIPLICATION_OPERATOR = "*";
+    private static final String SUBTRACTION_OPERATOR = "-";
+    private static final String SUM_OPERATOR = "+";
     private static final int MAX_INPUT_LENGTH = 20;
     private static final int INPUT_MODE = 0;
     private static final int RESULT_MODE = 1;
     private static final int ERROR_MODE = 2;
+
+    // swing constants
+    private final JMenu jMenuFile;
+    private final JMenu jMenuHelp;
+    private final JMenuItem jMenuItemExit;
+    private final JMenuItem jMenuItemAbout;
+
 
     // variables
     int displayMode;
@@ -22,11 +34,7 @@ public class Calculator extends JFrame implements ActionListener {
     double lastNumber;
     String lastOperator;
 
-    private JMenu jMenuFile;
-    private JMenu jMenuHelp;
-    private JMenuItem jMenuItemExit;
-    private JMenuItem jMenuItemAbout;
-
+    // swing variables
     private JLabel jLabelOutPut;
     private JButton[] jButtonButtons;
     private JPanel jPanelMaster;
@@ -90,6 +98,22 @@ public class Calculator extends JFrame implements ActionListener {
 
         if (e.getSource() == jMenuItemAbout) {
             JDialog jDialogAbout = new CustomAboutDialog(this, ABOUT_INFO, true);
+            jDialogAbout.setVisible(true);
+        } else if (e.getSource() == jMenuItemExit) {
+            System.exit(0);
+        }
+
+        //search for the button pressed until end of array or key found
+        for (int i = 0; i < jButtonButtons.length; i++) {
+            if (e.getSource() == jButtonButtons[i]) {
+                if (i < 10) {
+                    addDigitToDisplay(i);
+                }
+                if (i >= 13 && i <= 16) {
+                    processOperator(jButtonButtons[i].getText());
+                }
+
+            }
         }
 
 
@@ -108,8 +132,6 @@ public class Calculator extends JFrame implements ActionListener {
 
     private void addComponentsToFrame() {
 
-        final List<String> operators = Arrays.asList("+/-", ".", "=", "/", "*", "-", "+", "sqrt", "1/x", "%");
-
         getContentPane().add(jLabelOutPut, BorderLayout.NORTH);
 
         JPanel jPanelButtons = new JPanel(); //container for jButtonButtons
@@ -123,7 +145,7 @@ public class Calculator extends JFrame implements ActionListener {
         // create operator JButtons
         for (int i = 0; i < 10; i++) {
             // set each JButton to an operator
-            jButtonButtons[i + 10] = new JButton(operators.get(i));
+            jButtonButtons[i + 10] = new JButton(OPERATORS.get(i));
         }
 
         jPanelBackSpace = new JPanel();
@@ -225,10 +247,87 @@ public class Calculator extends JFrame implements ActionListener {
     }
 
     private void clearAll() {
-        jLabelOutPut.setText("0"); //set display string
+        setDisplayString("0"); //set display string
         lastOperator = "0";
         lastNumber = 0;
         displayMode = INPUT_MODE;
         clearOnNextDigit = true;
+    }
+
+    private void addDigitToDisplay(int digit) {
+        if (clearOnNextDigit) setDisplayString("");
+
+        String inputString = jLabelOutPut.getText();
+
+        if (inputString.indexOf("0") == 0) {
+            inputString = inputString.substring(1);
+        }
+
+        if ((!inputString.equals("0") || digit > 0) && inputString.length() < MAX_INPUT_LENGTH) {
+            setDisplayString(inputString + digit);
+        }
+
+        displayMode = INPUT_MODE;
+        clearOnNextDigit = false;
+    }
+
+    private void processOperator(String operator) {
+        if (displayMode != ERROR_MODE) {
+            double numberInDisplay = getNumberInDisplay();
+            if (!"0".equals(lastOperator)) {
+                try {
+                    double result = processLastOperator();
+                    displayResult(result);
+                } catch (DivideByZeroException e) {
+                    displayError(e.getMessage());
+                }
+            } else {
+                lastNumber = numberInDisplay;
+            }
+
+            clearOnNextDigit = true;
+            lastOperator = operator;
+        }
+    }
+
+    private double processLastOperator() throws DivideByZeroException {
+        double numberInDisplay = getNumberInDisplay();
+
+        switch (lastOperator) {
+            case DIVISION_OPERATOR:
+                if (numberInDisplay == 0)
+                    throw new DivideByZeroException("Division by zero is not allowed in mathematics!");
+                return lastNumber / numberInDisplay;
+            case MULTIPLICATION_OPERATOR:
+                return lastNumber / numberInDisplay;
+            case SUBTRACTION_OPERATOR:
+                return lastNumber - numberInDisplay;
+            case SUM_OPERATOR:
+                return lastNumber + numberInDisplay;
+            default:
+                return 0;
+        }
+    }
+
+    private double getNumberInDisplay() {
+        return Double.parseDouble(jLabelOutPut.getText());
+    }
+
+    private void displayResult(double result) {
+        setDisplayString(Double.toString(result));
+        lastNumber = result;
+        displayMode = RESULT_MODE;
+        clearOnNextDigit = true;
+    }
+
+    private void displayError(String error) {
+        setDisplayString(error);
+        lastNumber = 0;
+        displayMode = RESULT_MODE;
+        clearOnNextDigit = true;
+    }
+
+    private void setDisplayString(String string) {
+        jLabelOutPut.setText(string);
     }
 }
