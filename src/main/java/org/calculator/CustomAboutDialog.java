@@ -9,10 +9,13 @@ public class CustomAboutDialog extends JDialog implements ActionListener {
 
     public CustomAboutDialog(JFrame parent, String title, boolean modal) {
         super(parent, title, modal);
+        setLayout(new BorderLayout());
         setBackground(Color.BLACK);
 
-        setPanelsAndTextArea();
+        setPreferredSize(new Dimension(400, 300));
 
+        setPanelsAndTextArea();
+        pack();
         setLocation(408, 270);
         setResizable(false);
 
@@ -47,7 +50,7 @@ public class CustomAboutDialog extends JDialog implements ActionListener {
         jTextAreaAbout.setEditable(false);
 
         jPanel1.add(jTextAreaAbout);
-        jPanel1.setBackground(Color.RED);
+        jPanel1.setBackground(Color.LIGHT_GRAY);
         getContentPane().add(jPanel1, BorderLayout.CENTER);
 
         JPanel jPanel2 = new JPanel(new FlowLayout(FlowLayout.CENTER));

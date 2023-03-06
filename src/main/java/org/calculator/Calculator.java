@@ -10,6 +10,10 @@ public class Calculator extends JFrame implements ActionListener {
 
     //constants
     private static final String ABOUT_INFO = " About Java Swing Calculator";
+    private static final String ABOUT_CALCULATOR = "About Calculator";
+    private static final String FILE = "File";
+    private static final String EXIT = "Exit";
+    private static final String HELP = "Help";
     private static final List<String> OPERATORS = Arrays.asList("+/-", ".", "=", "/", "*", "-", "+", "sqrt", "1/x", "%");
     private static final String DIVISION_OPERATOR = "/";
     private static final String MULTIPLICATION_OPERATOR = "*";
@@ -47,8 +51,8 @@ public class Calculator extends JFrame implements ActionListener {
      * Creates a new font from the specified name, style and point size
      */
 
-    Font notoMono16 = new Font("NotoMono", Font.PLAIN, 16);
-    Font notoMono16Bold = new Font("NotoMono", Font.BOLD, 16);
+    Font notoMono20 = new Font("NotoMono", Font.PLAIN, 20);
+    Font notoMono20Bold = new Font("NotoMono", Font.BOLD, 20);
 
     // constructor
     public Calculator() {
@@ -59,23 +63,23 @@ public class Calculator extends JFrame implements ActionListener {
          */
 
         // jMenuFile
-        jMenuFile = new JMenu("File");
-        jMenuFile.setFont(notoMono16Bold);
+        jMenuFile = new JMenu(FILE);
+        jMenuFile.setFont(notoMono20Bold);
         jMenuFile.setMnemonic(KeyEvent.VK_F);
 
-        jMenuItemExit = new JMenuItem("Exit");
-        jMenuItemExit.setFont(notoMono16);
+        jMenuItemExit = new JMenuItem(EXIT);
+        jMenuItemExit.setFont(notoMono20);
         jMenuItemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
 
         jMenuFile.add(jMenuItemExit);
 
         // jMenuHelp
-        jMenuHelp = new JMenu("Help");
-        jMenuHelp.setFont(notoMono16);
+        jMenuHelp = new JMenu(HELP);
+        jMenuHelp.setFont(notoMono20);
         jMenuHelp.setMnemonic(KeyEvent.VK_H);
 
-        jMenuItemAbout = new JMenuItem("About Calculator");
-        jMenuItemAbout.setFont(notoMono16);
+        jMenuItemAbout = new JMenuItem(ABOUT_CALCULATOR);
+        jMenuItemAbout.setFont(notoMono20);
 
         jMenuHelp.add(jMenuItemAbout);
 
@@ -150,12 +154,14 @@ public class Calculator extends JFrame implements ActionListener {
 
         getContentPane().add(jLabelOutPut, BorderLayout.NORTH);
 
+        jButtonButtons = new JButton[23];
+
         JPanel jPanelButtons = new JPanel(); //container for jButtonButtons
 
         // create numeric JButtons
         for (int i = 0; i < 10; i++) {
             // set each JButton to the value of index
-            jButtonButtons[i] = new JButton(String.valueOf(1));
+            jButtonButtons[i] = new JButton(String.valueOf(i));
         }
 
         // create operator JButtons
